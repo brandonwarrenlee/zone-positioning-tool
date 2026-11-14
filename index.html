@@ -48,6 +48,8 @@
   --md-sys-color-surface-container-highest:#333333; --md-sys-color-on-surface:#EDEDED; --md-sys-color-on-surface-variant:#B3B3B3;
   --md-sys-color-outline:#8C8C8C; --md-sys-color-outline-variant:#3D3D3D; color-scheme:dark}
 
+/* reserve the scrollbar's space so opening a section never nudges the page sideways */
+html{scrollbar-gutter:stable;overflow-y:scroll}
 body{background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--md-ref-typeface-plain)}
 .wrap{max-width:1000px;margin:0 auto;padding-block:24px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 header{margin-bottom:18px;display:flex;flex-wrap:wrap;gap:12px 16px;align-items:flex-start;justify-content:space-between}
@@ -95,7 +97,8 @@ body.no-scroll{overflow:hidden}
 .settings{display:flex;flex-wrap:wrap;gap:20px 48px;align-items:flex-start;padding-block:4px 8px}
 .exp-panel{margin:0 0 14px;padding:12px 0 4px;border-top:1px solid var(--md-sys-color-outline-variant)}
 /* small, quiet "Experience" disclosure button */
-.exp-toggle{display:flex;width:max-content;margin:-8px 0 6px -12px;--md-text-button-container-height:36px;--md-text-button-label-text-size:13px;--md-text-button-label-text-weight:500;
+.disclosures{display:flex;gap:4px;margin:-8px 0 6px -12px}
+.exp-toggle{display:flex;width:max-content;--md-text-button-container-height:36px;--md-text-button-label-text-size:13px;--md-text-button-label-text-weight:500;
   --md-text-button-label-text-color:var(--md-sys-color-on-surface-variant);--md-text-button-hover-label-text-color:var(--md-sys-color-on-surface);
   --md-text-button-focus-label-text-color:var(--md-sys-color-on-surface);--md-text-button-pressed-label-text-color:var(--md-sys-color-on-surface);
   --md-text-button-icon-color:var(--md-sys-color-on-surface-variant);--md-text-button-hover-icon-color:var(--md-sys-color-on-surface);
@@ -103,6 +106,50 @@ body.no-scroll{overflow:hidden}
 .exp-toggle{--md-sys-color-primary:var(--md-sys-color-on-surface-variant);color:var(--md-sys-color-on-surface-variant)}
 .exp-toggle .chev,.exp-toggle .chev path{fill:none!important;stroke:currentColor}
 .exp-toggle .chev{transition:transform .2s}
+/* roster */
+.roster-panel{display:flex;flex-direction:column;gap:14px}
+.roster-panel[hidden]{display:none}
+.roster-head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-start;justify-content:space-between}
+.roster-head .hint{margin:0;max-width:62ch}
+.roster-actions{display:flex;flex-wrap:wrap;gap:0 4px;margin-right:-12px}
+.roster-status{margin:-6px 0 0;color:var(--md-sys-color-primary)}
+.small-btn{--md-text-button-container-height:32px;--md-text-button-label-text-size:13px}
+.roles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.role{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;border-radius:12px;border:1.5px dashed var(--md-sys-color-outline-variant);min-width:0;position:relative}
+.role.over{border-color:var(--md-sys-color-primary);background:var(--md-sys-color-secondary-container)}
+.role-label{font:500 12px/16px var(--md-ref-typeface-plain);color:var(--md-sys-color-on-surface-variant);text-align:center}
+.role-name{font:500 13px/18px var(--md-ref-typeface-plain);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.role-clear{position:absolute;top:2px;right:2px;--md-icon-button-icon-size:16px;width:28px;height:28px;--md-icon-button-state-layer-width:28px;--md-icon-button-state-layer-height:28px}
+.players{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:12px 8px}
+.player{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.player.assigned .avatar{opacity:.45}
+.avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;overflow:hidden;flex:none;
+  background:var(--def);color:var(--def-ink);font:700 18px var(--jersey);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;position:relative}
+.avatar.blank{background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface-variant);font:400 22px var(--md-ref-typeface-plain)}
+.avatar img{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.avatar:focus-visible{outline:2px solid var(--ball);outline-offset:2px}
+.avatar .tag{position:absolute;bottom:0;left:0;right:0;font:700 10px/14px var(--md-ref-typeface-plain);background:rgba(0,0,0,.55);color:#fff;text-align:center}
+.role .avatar{cursor:grab}
+.role .avatar.empty{background:transparent;border:1.5px solid var(--md-sys-color-outline-variant);color:var(--md-sys-color-on-surface-variant);cursor:default}
+.player input{width:100%;min-width:0;box-sizing:border-box;padding:4px 6px;border-radius:6px;border:1px solid var(--md-sys-color-outline-variant);
+  background:transparent;color:var(--md-sys-color-on-surface);font:400 13px/18px var(--md-ref-typeface-plain);text-align:center}
+.player input:focus{outline:none;border-color:var(--md-sys-color-primary)}
+.photo-row{display:flex;flex-wrap:wrap;justify-content:center;gap:0 2px;min-height:16px}
+.add-player{width:48px;height:48px;border-radius:50%;border:1.5px dashed var(--md-sys-color-outline);background:transparent;
+  color:var(--md-sys-color-primary);font:400 24px/1 var(--md-ref-typeface-plain);cursor:pointer}
+.add-player:hover{background:var(--md-sys-color-secondary-container)}
+.add-player:focus-visible{outline:2px solid var(--ball);outline-offset:2px}
+.add-label{font:500 12px/18px var(--md-ref-typeface-plain);color:var(--md-sys-color-primary);padding-top:5px}
+.photo-row button{border:0;background:none;padding:0 4px;font:500 11px/16px var(--md-ref-typeface-plain);color:var(--md-sys-color-primary);cursor:pointer}
+.drag-ghost{position:fixed;z-index:100;pointer-events:none;transform:translate(-50%,-50%) scale(1.1);box-shadow:0 6px 18px rgba(0,0,0,.4)}
+@media (max-width:600px){.roles{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.role-label{font-size:11px}}
+.def .pic{display:none}.def.has-pic .pic{display:inline}.def.has-pic text.tok-text{display:none}
+.def .ring{fill:none;stroke:var(--def);stroke-width:3;display:none}.def.has-pic .ring{display:inline}
+.def .numtag{display:none}
+.def .numtag circle{fill:var(--def)}.def .numtag text{fill:var(--def-ink);font:700 9px var(--jersey);text-anchor:middle;dominant-baseline:central}
+.def .pname{display:none;font:600 10px var(--md-ref-typeface-plain);fill:var(--md-sys-color-on-surface-variant);text-anchor:middle;paint-order:stroke;stroke:var(--court);stroke-width:3px;stroke-linejoin:round}
+.def.has-player .pname{display:inline}
+.def.has-player:not(.has-pic) text.tok-text{font-size:15px}
 .exp-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
 @media (prefers-reduced-motion:reduce){.exp-toggle .chev{transition:none}}
 .settings .group{gap:6px}
@@ -119,6 +166,9 @@ md-list{--md-list-container-color:transparent;padding-block:4px}
 md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-space:4px;--md-list-item-bottom-space:4px;--md-list-item-two-line-container-height:64px;--md-list-item-supporting-text-color:var(--md-sys-color-on-surface-variant)}
 .chip{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;font:700 15px var(--jersey);background:var(--def);color:var(--def-ink)}
 .chip{margin:6px;position:relative}
+.chip.has-pic{background:none;padding:0}
+.chip img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.chip.has-pic{box-shadow:0 0 0 2px var(--def)}
 .chip-talk{position:absolute;top:-5px;right:-6px;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;
   background:#FFD43B;color:#1A1A1A;font:700 10px/1 var(--md-ref-typeface-plain);font-style:normal;box-shadow:0 0 0 2px var(--bg)}
 .yell{color:var(--md-sys-color-on-surface-variant);white-space:nowrap}
@@ -190,9 +240,29 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
           <div class="sets" id="presets" role="group" aria-label="Offense set"></div>
         </div>
       </div>
+      <div class="disclosures">
+      <md-text-button id="roster-toggle" class="exp-toggle" trailing-icon aria-expanded="false" aria-controls="roster-panel">Roster
+        <svg slot="icon" class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </md-text-button>
       <md-text-button id="exp-toggle" class="exp-toggle" trailing-icon aria-expanded="false" aria-controls="exp-panel">Experience
         <svg slot="icon" class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
       </md-text-button>
+      </div>
+      <div id="roster-panel" class="exp-panel roster-panel" hidden>
+        <div class="roster-head">
+          <p class="hint">Drag a player onto a spot below or onto a defender on the court. Tap a player's circle to add a photo. Names and photos stay on this device only. To share them with your coaches, use Export roster and send the file privately.</p>
+          <div class="roster-actions">
+            <md-text-button id="roster-export" class="small-btn">Export roster</md-text-button>
+            <md-text-button id="roster-import" class="small-btn">Import roster</md-text-button>
+            <md-text-button id="roster-clear" class="small-btn">Clear roster</md-text-button>
+          </div>
+        </div>
+        <p class="hint roster-status" id="roster-status" role="status" hidden></p>
+        <input type="file" id="roster-file" accept=".json,application/json" hidden>
+        <div class="roles" id="roles" aria-label="Defensive spots"></div>
+        <div class="players" id="players" aria-label="Players"></div>
+        <input type="file" id="photo-input" accept="image/*" hidden>
+      </div>
       <div id="exp-panel" class="settings exp-panel" hidden>
       <div class="group"><span class="label">Zone experience</span>
         <div class="level-row">
@@ -716,11 +786,211 @@ function solve(ball, trap){
   return {out, onSet, where, tip, talk};
 }
 
+/* ---------- roster (stored on this device only) ---------- */
+const ROLE_NAMES = {1:"Guard", 2:"Guard", 3:"Forward", 4:"Forward", 5:"Center"};
+const esc = t => String(t).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const MAX_PLAYERS = 12, START_PLAYERS = 5;
+const freshRoster = () => ({ players: Array.from({length:START_PLAYERS}, (_,i)=>({id:i+1, name:"", photo:""})), spots: {} });
+let roster = freshRoster();
+try { const saved = JSON.parse(localStorage.getItem("zone-roster") || "null");
+  if (saved && Array.isArray(saved.players) && saved.players.length){
+    roster = {players: saved.players.slice(0, MAX_PLAYERS), spots: saved.spots || {}};
+    // tidy up older saves that started with 12 empty slots
+    const used = new Set(Object.values(roster.spots));
+    while (roster.players.length > START_PLAYERS){
+      const last = roster.players[roster.players.length-1];
+      if (last.name || last.photo || used.has(last.id)) break;
+      roster.players.pop();
+    }
+  } } catch (err) {}
+const saveRoster = () => { try { localStorage.setItem("zone-roster", JSON.stringify(roster)); } catch (err) {} };
+const playerById = id => roster.players.find(p => p.id === id);
+const playerFor = n => { const id = roster.spots[n]; return id ? playerById(id) : null; };
+// first letter of the first name (the full name shows under the dot on the court)
+const initials = name => (name.trim().split(/\s+/)[0] || "").slice(0,1).toUpperCase();
+function paintDefPlayer(n){
+  const g = defEls[n]; if (!g) return;
+  const pl = playerFor(n), img = g.querySelector(".pic"), name = g.querySelector(".pname"), num = g.querySelector("text.tok-text");
+  g.classList.toggle("has-player", !!pl);
+  g.classList.toggle("has-pic", !!(pl && pl.photo));
+  if (pl && pl.photo) img.setAttribute("href", pl.photo); else img.removeAttribute("href");
+  name.textContent = pl ? (pl.name || "") : "";
+  num.textContent = pl && !pl.photo ? (initials(pl.name) || n) : n;
+}
+function assign(n, id){
+  for (const k of Object.keys(roster.spots)) if (roster.spots[k] === id) delete roster.spots[k];
+  if (id) roster.spots[n] = id; else delete roster.spots[n];
+  saveRoster(); renderRoster(); render();
+}
+function avatarHTML(pl, extra=""){
+  if (!pl) return `<div class="avatar empty ${extra}"></div>`;
+  const blank = !pl.name && !pl.photo;   // unnamed slots stay neutral so their numbers aren't confused with spots 1-5
+  return `<div class="avatar ${extra}${blank ? " blank" : ""}" tabindex="0" data-pid="${pl.id}" aria-label="${esc(pl.name || "Empty player slot")}">${pl.photo ? `<img src="${pl.photo}" alt="">` : (esc(initials(pl.name)) || "+")}</div>`;
+}
+function renderRoster(){
+  document.getElementById("roles").innerHTML = [1,2,3,4,5].map(n => {
+    const pl = playerFor(n);
+    return `<div class="role" data-role="${n}">${avatarHTML(pl, "in-role")}<span class="role-label">${n} · ${ROLE_NAMES[n]}</span>`
+      + `<span class="role-name">${pl ? esc(pl.name || "No name yet") : "Drop here"}</span>`
+      + (pl ? `<md-icon-button class="role-clear" data-clear="${n}" aria-label="Remove from spot ${n}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></md-icon-button>` : "")
+      + `</div>`;
+  }).join("");
+  const inSpot = new Set(Object.values(roster.spots));
+  document.getElementById("players").innerHTML = roster.players.map(pl =>
+    `<div class="player${inSpot.has(pl.id) ? " assigned" : ""}">${avatarHTML(pl)}`
+    + `<input type="text" id="pname-${pl.id}" data-pid="${pl.id}" value="${esc(pl.name)}" placeholder="Name" maxlength="16" aria-label="Player ${pl.id} name">`
+    + `<div class="photo-row">${pl.photo ? `<button type="button" data-unphoto="${pl.id}">Remove photo</button>` : ""}`
+    + `${roster.players.length > 1 ? `<button type="button" data-remove="${pl.id}">Remove</button>` : ""}</div>`
+    + `</div>`).join("")
+    + (roster.players.length < MAX_PLAYERS ? `<div class="player add-slot"><button type="button" class="add-player" id="add-player" aria-label="Add player">+</button><span class="add-label">Add player</span></div>` : "");
+}
+// name edits
+document.getElementById("players").addEventListener("input", e => {
+  const id = +e.target.dataset.pid; if (!id) return;
+  playerById(id).name = e.target.value; saveRoster();
+  document.querySelectorAll(`.avatar[data-pid="${id}"]`).forEach(a => { if (!playerById(id).photo){ a.textContent = initials(e.target.value) || "+"; a.classList.toggle("blank", !e.target.value); } });
+  render(); document.querySelectorAll(".role").forEach(r => { const pl = playerFor(+r.dataset.role); if (pl && pl.id===id) r.querySelector(".role-name").textContent = pl.name || "No name yet"; });
+});
+document.getElementById("players").addEventListener("click", e => {
+  if (e.target.closest("#add-player")){
+    if (roster.players.length >= MAX_PLAYERS) return;
+    const id = Math.max(0, ...roster.players.map(p=>p.id)) + 1;
+    roster.players.push({id, name:"", photo:""}); saveRoster(); renderRoster();
+    const inp = document.getElementById("pname-" + id); if (inp) inp.focus();
+    return;
+  }
+  const rid = +e.target.dataset.remove;
+  if (rid){
+    roster.players = roster.players.filter(p => p.id !== rid);
+    for (const k of Object.keys(roster.spots)) if (roster.spots[k] === rid) delete roster.spots[k];
+    saveRoster(); renderRoster(); render(); return;
+  }
+  const id = +e.target.dataset.unphoto; if (!id) return;
+  playerById(id).photo = ""; saveRoster(); renderRoster(); render();
+});
+document.getElementById("roles").addEventListener("click", e => {
+  const b = e.target.closest("[data-clear]"); if (b) assign(+b.dataset.clear, null);
+});
+// clear roster: tap twice to confirm
+const clearBtn = document.getElementById("roster-clear"); let clearArmed = 0;
+clearBtn.addEventListener("click", () => {
+  if (Date.now() - clearArmed < 3000){
+    roster = freshRoster();
+    saveRoster(); renderRoster(); render(); clearBtn.textContent = "Clear roster"; clearArmed = 0;
+  } else { clearArmed = Date.now(); clearBtn.textContent = "Tap again to clear"; setTimeout(()=>{ if (clearArmed && Date.now()-clearArmed >= 3000){ clearBtn.textContent = "Clear roster"; clearArmed = 0; } }, 3100); }
+});
+// export / import: a small file coaches pass along privately (nothing goes online)
+let dlNS = null;
+try { window.claude?.use?.("downloads")?.then(ns => { dlNS = ns; }).catch(()=>{}); } catch (err) {}
+const rosterStatus = document.getElementById("roster-status"); let statusTimer = 0;
+const showStatus = msg => { rosterStatus.textContent = msg; rosterStatus.hidden = false; clearTimeout(statusTimer); statusTimer = setTimeout(()=>{ rosterStatus.hidden = true; }, 6000); };
+document.getElementById("roster-export").addEventListener("click", () => {
+  const named = roster.players.filter(p => p.name || p.photo).length;
+  if (!named){ showStatus("Add at least one name or photo before exporting."); return; }
+  const data = JSON.stringify({app:"zone-roster", version:1, players:roster.players, spots:roster.spots});
+  const done = `Saved zone-roster.json (${named} player${named===1?"":"s"}). Send it privately to your coaches.`;
+  if (dlNS){   // inside Claude: the viewer confirms the save
+    dlNS.save({filename:"zone-roster.json", data}).then(() => showStatus(done)).catch(err => {
+      showStatus(err && err.code === "declined" ? "Export canceled." : "Couldn't save the file here. Try exporting from your GitHub link.");
+    });
+    return;
+  }
+  const url = URL.createObjectURL(new Blob([data], {type:"application/json"}));   // a normal web page (GitHub)
+  const a = document.createElement("a"); a.href = url; a.download = "zone-roster.json";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  showStatus(done);
+});
+const rosterFile = document.getElementById("roster-file");
+document.getElementById("roster-import").addEventListener("click", () => rosterFile.click());
+rosterFile.addEventListener("change", () => {
+  const f = rosterFile.files && rosterFile.files[0]; rosterFile.value = ""; if (!f) return;
+  if (f.size > 2_000_000){ showStatus("That file is too big to be a roster file."); return; }
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const d = JSON.parse(rd.result);
+      if (!d || d.app !== "zone-roster" || !Array.isArray(d.players)) throw new Error("not a roster");
+      const players = d.players.slice(0, MAX_PLAYERS).map((p,i) => ({
+        id: Number.isInteger(p.id) ? p.id : i+1,
+        name: typeof p.name === "string" ? p.name.slice(0,16) : "",
+        photo: typeof p.photo === "string" && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo) && p.photo.length < 400000 ? p.photo : ""
+      }));
+      const ids = new Set(players.map(p=>p.id)), spots = {};
+      for (const [k,v] of Object.entries(d.spots || {})) if (["1","2","3","4","5"].includes(k) && ids.has(v)) spots[k] = v;
+      if (!players.length) throw new Error("empty");
+      roster = {players, spots}; saveRoster(); renderRoster(); render();
+      showStatus(`Loaded ${players.length} player${players.length===1?"":"s"} from ${f.name}. It's saved on this device now.`);
+    } catch (err) { showStatus("That file isn't a roster file. Use one made with Export roster."); }
+  };
+  rd.readAsText(f);
+});
+
+// photos: shrink to a small square so it stores easily
+const photoInput = document.getElementById("photo-input"); let photoFor = null;
+photoInput.addEventListener("change", () => {
+  const f = photoInput.files && photoInput.files[0]; photoInput.value = ""; if (!f || !photoFor) return;
+  const id = photoFor; photoFor = null;
+  const rd = new FileReader();
+  rd.onload = () => { const im = new Image(); im.onload = () => {
+    const c = document.createElement("canvas"), sz = 128; c.width = c.height = sz;
+    const side = Math.min(im.width, im.height), sx = (im.width-side)/2, sy = (im.height-side)/2;
+    c.getContext("2d").drawImage(im, sx, sy, side, side, 0, 0, sz, sz);
+    playerById(id).photo = c.toDataURL("image/jpeg", 0.8); saveRoster(); renderRoster(); render();
+  }; im.src = rd.result; };
+  rd.readAsDataURL(f);
+});
+// drag and drop with pointer events (mouse and touch); a tap on a roster avatar adds a photo
+let drag2 = null;
+document.addEventListener("pointerdown", e => {
+  const av = e.target.closest(".avatar[data-pid]"); if (!av) return;
+  e.preventDefault();
+  drag2 = {id:+av.dataset.pid, from: av.closest(".role") ? +av.closest(".role").dataset.role : null, x:e.clientX, y:e.clientY, el:av, ghost:null};
+});
+document.addEventListener("pointermove", e => {
+  if (!drag2) return;
+  if (!drag2.ghost){
+    if (Math.hypot(e.clientX-drag2.x, e.clientY-drag2.y) < 6) return;
+    const gh = drag2.el.cloneNode(true); gh.classList.add("drag-ghost"); gh.removeAttribute("tabindex"); document.body.appendChild(gh); drag2.ghost = gh;
+  }
+  drag2.ghost.style.left = e.clientX + "px"; drag2.ghost.style.top = e.clientY + "px";
+  document.querySelectorAll(".role.over").forEach(r => r.classList.remove("over"));
+  const over = document.elementFromPoint(e.clientX, e.clientY);
+  const role = over && over.closest && over.closest(".role"); if (role) role.classList.add("over");
+});
+function courtRoleAt(x, y){
+  const r = svg.getBoundingClientRect(); if (x<r.left || x>r.right || y<r.top || y>r.bottom || !lastSolve) return null;
+  const pt = svg.createSVGPoint(); pt.x = x; pt.y = y; const q = pt.matrixTransform(svg.getScreenCTM().inverse());
+  let best = null, bd = 4;
+  for (let n=1;n<=5;n++){ const p = lastSolve.out[n].p, d = Math.hypot(q.x/S-p.x, q.y/S-p.y); if (d < bd){ bd = d; best = n; } }
+  return best;
+}
+document.addEventListener("pointerup", e => {
+  if (!drag2) return;
+  const d = drag2; drag2 = null;
+  document.querySelectorAll(".role.over").forEach(r => r.classList.remove("over"));
+  if (!d.ghost){ if (d.from == null){ photoFor = d.id; photoInput.click(); } return; }
+  d.ghost.remove();
+  const over = document.elementFromPoint(e.clientX, e.clientY);
+  const role = over && over.closest && over.closest(".role");
+  const target = role ? +role.dataset.role : courtRoleAt(e.clientX, e.clientY);
+  if (target) assign(target, d.id);
+  else if (d.from != null) assign(d.from, null);   // dragged out of a spot: take them off it
+});
+document.addEventListener("pointercancel", () => { if (drag2 && drag2.ghost) drag2.ghost.remove(); drag2 = null; });
+document.addEventListener("keydown", e => {
+  const av = document.activeElement && document.activeElement.closest && document.activeElement.closest(".avatar[data-pid]");
+  if (av && (e.key === "Enter" || e.key === " ") && !av.closest(".role")){ e.preventDefault(); photoFor = +av.dataset.pid; photoInput.click(); }
+});
+renderRoster();
+
 /* ---------- drawing ---------- */
 const defEls = {};
 for (let n=1;n<=5;n++){
   const g = document.createElementNS(NS,"g"); g.setAttribute("class","def");
-  g.innerHTML = `<circle class="press" r="20"/><circle class="body" r="14"/><text class="tok-text">${n}</text>`;
+  g.innerHTML = `<defs><clipPath id="dclip${n}"><circle r="14"/></clipPath></defs><circle class="press" r="20"/><circle class="body" r="14"/>`
+    + `<image class="pic" x="-14" y="-14" width="28" height="28" preserveAspectRatio="xMidYMid slice" clip-path="url(#dclip${n})"/>`
+    + `<circle class="ring" r="14"/><text class="tok-text">${n}</text>`
+    + `<g class="numtag" transform="translate(-11 11)"><circle r="6.5"/><text>${n}</text></g><text class="pname" y="27"></text>`;
   gDef.appendChild(g); defEls[n]=g;
 }
 const talkEls = {}, gTalk = document.getElementById("talk-layer");
@@ -755,6 +1025,7 @@ function render(){
     defEls[n].style.transitionDuration = dur; talkEls[n].style.transitionDuration = dur;
     lastPos[n] = {x:p.x, y:p.y};
     defEls[n].style.transform = `translate(${p.x*S}px, ${p.y*S}px)`;
+    paintDefPlayer(n);
     defEls[n].classList.toggle("onball", r.onSet.has(n));
     talkEls[n].style.transform = `translate(${p.x*S}px, ${p.y*S}px)`;
     const t = r.talk[n];
@@ -767,7 +1038,10 @@ function render(){
   document.getElementById("jobs").innerHTML = [1,2,3,4,5].map(n=>{
     const j = r.out[n].job;
     const t = r.talk[n];
-    return `<md-list-item><span slot="start" class="chip${r.onSet.has(n)?" hot":""}">${n}${t ? '<i class="chip-talk" aria-hidden="true">!</i>' : ""}</span><div slot="headline">${j.role}${t ? ` <span class="yell">· Yell: "${t.call}"</span>` : ""}</div></md-list-item>`;
+    const pl = playerFor(n);
+    const face = pl && pl.photo ? `<img src="${pl.photo}" alt="">` : n;
+    const nm = pl && pl.name ? `<b>${esc(pl.name)}</b>: ` : "";
+    return `<md-list-item><span slot="start" class="chip${r.onSet.has(n)?" hot":""}${pl && pl.photo ? " has-pic" : ""}">${face}${t ? '<i class="chip-talk" aria-hidden="true">!</i>' : ""}</span><div slot="headline">${nm}${j.role}${t ? ` <span class="yell">· Yell: "${t.call}"</span>` : ""}</div></md-list-item>`;
   }).join("");
 }
 
@@ -844,6 +1118,10 @@ const setLevel = adv => {
 };
 levelSw.addEventListener("change", e => setLevel(!!e.target.selected));
 const expBtn = document.getElementById("exp-toggle"), expPanel = document.getElementById("exp-panel");
+const rosterBtn = document.getElementById("roster-toggle"), rosterPanel = document.getElementById("roster-panel");
+rosterBtn.addEventListener("click", () => {
+  const open = rosterPanel.hidden; rosterPanel.hidden = !open; rosterBtn.setAttribute("aria-expanded", String(open));
+});
 expBtn.addEventListener("click", () => {
   const open = expPanel.hidden; expPanel.hidden = !open; expBtn.setAttribute("aria-expanded", String(open));
 });
