@@ -76,6 +76,13 @@ md-slider{width:180px;max-width:100%;margin-inline:-14px}
 .switch-row{display:grid;grid-template-columns:auto max-content;align-items:center;gap:12px;font:500 14px/20px var(--md-ref-typeface-plain);color:var(--md-sys-color-on-surface);cursor:pointer}
 svg#court{display:block;width:100%;height:auto;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;border-radius:8px}
 .off .hit{fill:transparent}
+/* full-screen court, on every screen size */
+.court-wrap{position:relative}
+.fs-btn{position:absolute;right:8px;bottom:8px}
+.court-wrap.is-full{position:fixed;inset:0;z-index:50;background:var(--court);display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.court-wrap.is-full svg#court{width:100%;height:100%;border-radius:0}
+.court-wrap.is-full .fs-btn{right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px))}
+body.no-scroll{overflow:hidden}
 @media (max-width:600px){
   .court-card{padding:10px}
   .toolbar{justify-content:flex-start;gap:12px 20px}
@@ -152,6 +159,7 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
         </div>
       </div>
 
+      <div class="court-wrap">
       <svg id="court" viewBox="-262 -18 524 362" role="img" aria-label="Half court with offense and 2-3 zone defense">
         <rect class="court-bg" x="-262" y="-18" width="524" height="362"/>
         <rect class="paint" x="-60" y="0" width="120" height="190"/>
@@ -178,6 +186,11 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
         <g id="defense"></g>
         <g id="offense"></g>
       </svg>
+      <md-filled-tonal-icon-button id="fs-btn" class="fs-btn" aria-label="Full screen">
+        <svg class="i-open" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+        <svg class="i-close" hidden viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+      </md-filled-tonal-icon-button>
+      </div>
 
       <div class="legend">
         <span><i style="background:var(--off)"></i>Offense (drag, tap to give the ball)</span>
@@ -629,6 +642,24 @@ const setAge = ()=>{
 };
 ageInput.addEventListener("input", setAge);
 ageInput.addEventListener("change", setAge);
+
+// full-screen court (real fullscreen where the browser allows it, otherwise a fixed overlay)
+const wrapEl = document.querySelector(".court-wrap"), fsBtn = document.getElementById("fs-btn");
+const setFull = on => {
+  wrapEl.classList.toggle("is-full", on); document.body.classList.toggle("no-scroll", on);
+  fsBtn.setAttribute("aria-label", on ? "Exit full screen" : "Full screen");
+  fsBtn.querySelector(".i-open").hidden = on; fsBtn.querySelector(".i-close").hidden = !on;
+};
+fsBtn.addEventListener("click", () => {
+  const on = !wrapEl.classList.contains("is-full");
+  setFull(on);
+  try {
+    if (on && wrapEl.requestFullscreen) wrapEl.requestFullscreen().catch(()=>{});
+    else if (!on && document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  } catch (err) {}
+});
+document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && wrapEl.classList.contains("is-full")) setFull(false); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && wrapEl.classList.contains("is-full")) setFull(false); });
 
 // light/dark mode switch in the header
 const themeSw = document.getElementById("theme"), rootEl = document.documentElement;
