@@ -60,7 +60,7 @@ h1{margin:4px 0 6px;font:400 clamp(28px,4.5vw,36px)/1.15 var(--md-ref-typeface-b
 @media (max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
 .surface{background:var(--md-sys-color-surface);border-radius:12px;min-width:0}
 .court-card{padding:16px}
-.toolbar{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.toolbar{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
 .group{display:flex;flex-direction:column;gap:6px;min-width:0}
 .label{display:flex;align-items:center;min-height:36px;font:500 14px/20px var(--md-ref-typeface-plain);color:var(--md-sys-color-on-surface)}
 .sets{display:flex;flex-wrap:wrap;gap:8px}
@@ -71,8 +71,8 @@ h1{margin:4px 0 6px;font:400 clamp(28px,4.5vw,36px)/1.15 var(--md-ref-typeface-b
 md-slider{margin-block:-6px}
 md-outlined-button{--md-outlined-button-container-height:36px;--md-outlined-button-leading-space:18px;--md-outlined-button-trailing-space:18px}
 md-slider{width:180px;max-width:100%;margin-inline:-14px}
-.toolbar .switches{display:grid;grid-template-columns:max-content auto;gap:6px 12px;min-height:0}
-.switches .switch-row{grid-column:span 2;grid-template-columns:subgrid;min-height:36px}
+.toolbar .switches{display:flex;flex-wrap:wrap;gap:6px 28px;min-height:0}
+.switches .switch-row{min-height:36px}
 .switch-row{display:grid;grid-template-columns:auto max-content;align-items:center;gap:12px;font:500 14px/20px var(--md-ref-typeface-plain);color:var(--md-sys-color-on-surface);cursor:pointer}
 svg#court{display:block;width:100%;height:auto;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;border-radius:8px}
 .off .hit{fill:transparent}
@@ -91,6 +91,24 @@ body.no-scroll{overflow:hidden}
 .legend{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:12px;font-size:13px;color:var(--md-sys-color-on-surface-variant)}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px}
 .panel{padding:4px 0 0;min-width:0}
+.settings{display:flex;flex-wrap:wrap;gap:20px 48px;align-items:flex-start;padding-block:4px 8px}
+.exp-panel{margin:0 0 14px;padding:12px 0 4px;border-top:1px solid var(--md-sys-color-outline-variant)}
+/* small, quiet "Experience" disclosure button */
+.exp-toggle{display:flex;width:max-content;margin:-8px 0 6px -12px;--md-text-button-container-height:36px;--md-text-button-label-text-size:13px;--md-text-button-label-text-weight:500;
+  --md-text-button-label-text-color:var(--md-sys-color-on-surface-variant);--md-text-button-hover-label-text-color:var(--md-sys-color-on-surface);
+  --md-text-button-focus-label-text-color:var(--md-sys-color-on-surface);--md-text-button-pressed-label-text-color:var(--md-sys-color-on-surface);
+  --md-text-button-icon-color:var(--md-sys-color-on-surface-variant);--md-text-button-hover-icon-color:var(--md-sys-color-on-surface);
+  --md-text-button-leading-space:12px;--md-text-button-trailing-space:10px}
+.exp-toggle{--md-sys-color-primary:var(--md-sys-color-on-surface-variant);color:var(--md-sys-color-on-surface-variant)}
+.exp-toggle .chev,.exp-toggle .chev path{fill:none!important;stroke:currentColor}
+.exp-toggle .chev{transition:transform .2s}
+.exp-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+@media (prefers-reduced-motion:reduce){.exp-toggle .chev{transition:none}}
+.settings .group{gap:6px}
+.level-row{display:flex;align-items:center;gap:12px;min-height:36px;font:500 14px/20px var(--md-ref-typeface-plain)}
+.lvl{color:var(--md-sys-color-on-surface-variant)}
+.lvl.on{color:var(--md-sys-color-on-surface)}
+.hint{margin:2px 0 0;max-width:46ch;font-size:13px;line-height:1.45;color:var(--md-sys-color-on-surface-variant)}
 @media (min-width:760px){.panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:32px;align-items:start}}
 .panel>.pad{padding-inline:0}
 .panel md-list-item{--md-list-item-leading-space:0;--md-list-item-trailing-space:0}
@@ -151,12 +169,25 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
             <label class="switch-row"><md-switch id="show-zones" aria-label="Show zones"></md-switch> Show zones</label>
           </div>
         </div>
-        <div class="group"><span class="label" id="age-label">Age · 10 years</span>
-          <md-slider id="age" min="5" max="15" step="5" value="10" ticks labeled aria-label="Player age"></md-slider>
-        </div>
-        <div class="group"><span class="label">Offense set</span>
+        <div class="group">
           <div class="sets" id="presets" role="group" aria-label="Offense set"></div>
         </div>
+      </div>
+      <md-text-button id="exp-toggle" class="exp-toggle" trailing-icon aria-expanded="false" aria-controls="exp-panel">Experience
+        <svg slot="icon" class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </md-text-button>
+      <div id="exp-panel" class="settings exp-panel" hidden>
+      <div class="group"><span class="label">Zone experience</span>
+        <div class="level-row">
+          <span id="lvl-beg" class="lvl on">Level 1</span>
+          <md-switch id="level" aria-label="Level 2"></md-switch>
+          <span id="lvl-adv" class="lvl">Level 2</span>
+        </div>
+        <p class="hint" id="level-hint">Start home, ball moves you move, hands in the passing lanes, above the line guard / below the line forward, center guards the paint.</p>
+      </div>
+      <div class="group"><span class="label" id="age-label">Age · 10 years</span>
+        <md-slider id="age" min="10" max="15" step="5" value="10" ticks labeled aria-label="Player age"></md-slider>
+      </div>
       </div>
 
       <div class="court-wrap">
@@ -180,7 +211,6 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
           <line class="ln" x1="-69" y1="170" x2="-60" y2="170"/><line class="ln" x1="60" y1="170" x2="69" y2="170"/>
         </g>
         <line class="ln-faint" x1="-250" y1="190" x2="-60" y2="190"/><line class="ln-faint" x1="60" y1="190" x2="250" y2="190"/>
-        <text class="svg-label" x="0" y="334" text-anchor="middle">TOWARD HALF COURT ↓</text>
         <defs><clipPath id="courtclip"><rect x="-250" y="0" width="500" height="345"/></clipPath></defs>
         <g id="zones" clip-path="url(#courtclip)" style="display:none"></g>
         <g id="defense"></g>
@@ -206,6 +236,7 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
       </div>
       <md-list id="jobs"></md-list>
     </aside>
+
   </div>
 </div>
 
@@ -219,7 +250,7 @@ const PRESETS = {
   "load": {label:"4-1 Load",   pts:[[0,26],[-17,17],[-21,3],[18,15],[7.5,8]]},  // shown at age 10
   "5out": {label:"5-out",      pts:[[0,27],[-17,20],[17,20],[-21,2.5],[21,2.5]]}
 };
-const state = {preset:"4out", off:[], ball:0, trap:false, age:10};
+const state = {preset:"4out", off:[], ball:0, trap:false, age:10, level:"beginner"};
 
 const svg = document.getElementById("court");
 const gDef = document.getElementById("defense"), gOff = document.getElementById("offense");
@@ -284,7 +315,8 @@ function solve(ball, trap){
   const id = {GB: side>0?2:1, GW: side>0?1:2, FB: side>0?4:3, FW: side>0?3:4, C:5};
   const zone = classify(b);
   const trapWanted = trap;
-  trap = trap && state.age !== 5 && (["corner","short","low"].includes(zone) || (zone === "wing" && b.y < 19)); // wing trap only below FT line extended
+  const adv = state.level === "advanced"; // beginner: home spots, slide with the ball, no traps or extras
+  trap = trap && adv && state.age !== 5 && (["corner","short","low"].includes(zone) || (zone === "wing" && b.y < 19)); // wing trap only below FT line extended
   const ballD = d => outOfRange(b) ? 5.5 : d; // few 5th graders hit 3s: sag off the ball outside the arc // only trap where the sideline/baseline help
   let pos = {}, jobs = {}, onBall = [], pinned = [], tip = "";
 
@@ -297,16 +329,31 @@ function solve(ball, trap){
       jobs.FB = J("Ball-side low","Ready to slide out if the ball goes to your wing.");
       // a wing is one pass away on the ball side: play up the line with a hand in the passing lane
       const wing = state.off.map((o,i)=>({o:m(o),i}))
-        .filter(w=>w.i!==state.ball && w.o.x>9 && w.o.y>=8 && w.o.y<=22)
+        .filter(w=>w.i!==state.ball && w.o.x>9 && w.o.y>=8 && w.o.y<19 /* low wing only: a high wing is the guard's catch */)
         .sort((a,c)=>Math.hypot(a.o.x-16,a.o.y-15)-Math.hypot(c.o.x-16,c.o.y-15))[0];
+      // forward shades up toward their wing to get a hand in the passing lane
+      // (beginner: about halfway, staying close to home; advanced: all the way up the line)
       if (wing){
-        const w = wing.o, lane = P(b.x+(w.x-b.x)*0.75, b.y+(w.y-b.y)*0.75);
-        pos.FB = toward(lane, 1.8); pos.C = P(2,7.5); pinned.push("FB");
+        const w = wing.o, lane = P(b.x+(w.x-b.x)*0.75, b.y+(w.y-b.y)*0.75), spot = toward(lane, 1.8), k = adv ? 1 : 0.5;
+        pos.FB = P(pos.FB.x+(spot.x-pos.FB.x)*k, pos.FB.y+(spot.y-pos.FB.y)*k); pos.C = P(2,7.5); pinned.push("FB");
         jobs.FB = J("Hand in the passing lane","Play up the line toward your wing, one hand in the lane. Don't overplay or they'll cut behind you.");
         jobs.C  = J("Cover the block","Slide toward the ball side to cover behind your forward.");
       }
       jobs.FW = J("Weak-side low","Stay near the paint and watch your side.");
       jobs.C  = J("Middle of the paint","Guard the high post from below.");
+      // ball dead center: both wings are one pass away, so the other forward mirrors the ball-side forward
+      if (X < 4){
+        const wing2 = state.off.map((o,i)=>({o:m(o),i}))
+          .filter(w=>w.i!==state.ball && w.o.x < -9 && w.o.y >= 8 && w.o.y < 19)
+          .sort((a,c)=>Math.hypot(a.o.x+16,a.o.y-15)-Math.hypot(c.o.x+16,c.o.y-15))[0];
+        if (wing2){
+          const w = wing2.o, lane = P(b.x+(w.x-b.x)*0.75, b.y+(w.y-b.y)*0.75), spot = toward(lane, 1.8), k = adv ? 1 : 0.5;
+          pos.FW = P(pos.FW.x+(spot.x-pos.FW.x)*k, pos.FW.y+(spot.y-pos.FW.y)*k); pinned.push("FW");
+          jobs.FW = J("Hand in the passing lane","Play up the line toward your wing, one hand in the lane. Don't overplay or they'll cut behind you.");
+          pos.C = P(0,7);
+          jobs.C = J("Protect the rim","Both forwards are up the line. You own the paint.");
+        }
+      }
       tip = "One guard takes the ball. Everyone else keeps the ball out of the middle.";
     } else {
       [pos.GB, pos.GW] = assignTrap(trapPts(b), P(6,20), P(-6,20));
@@ -321,12 +368,15 @@ function solve(ball, trap){
   } else if (zone === "wing"){
     if (!trap){
       if (Y < 19){ // low wing: below the FT line extended the forward takes it, the guard stays up
-        pos.FB = toward(b, ballD(3)); pos.GB = P(8.5,16.5); pos.GW = P(0,16); pos.C = P(4.5,6); pos.FW = P(-4,5.5);
+        pos.FB = toward(b, ballD(3)); pos.GB = P(6.5,19.5); pos.GW = P(0,16); pos.C = P(4.5,6); pos.FW = P(-4,5.5);
+        // someone in the ball-side corner: the center slides out to the short corner to take that pass
+        const cornerMan = state.off.some((o,i)=> i!==state.ball && m(o).x > 15 && m(o).y < 9);
         onBall = ["FB"];
         jobs.FB = J("On the ball","Below the free-throw line extended, the forward takes it. Stop the baseline drive.");
-        jobs.GB = J("Ball-side elbow","Stay up. Stop the pass back out and anyone cutting to the middle.");
+        jobs.GB = J("Ball-side elbow","Stay up. Stop the pass back to the top and anyone cutting to the middle.");
         jobs.GW = J("High post","Drop to the free-throw line.");
         jobs.C  = J("Ball-side block","Get in front of anyone on the block.");
+        if (cornerMan){ pos.C = P(8,5); jobs.C = J("Cover the corner side","Slide to the ball-side short corner. The corner pass is yours."); }
         jobs.FW = J("Protect the rim","Weak side drops to the basket. Box out on shots.");
         tip = "Low wing: below the free-throw line extended, the forward takes the ball and the guard stays up.";
       } else { // high wing: guard takes it
@@ -343,7 +393,7 @@ function solve(ball, trap){
           .filter(w=>w.i!==state.ball && w.o.x<4 && w.o.y>=19)
           .sort((a,c)=>Math.hypot(a.o.x+6,a.o.y-24)-Math.hypot(c.o.x+6,c.o.y-24))[0];
         if (topMan){
-          const canShoot = !outOfRange(topMan.o), t = canShoot ? 0.55 : 0.35, hp = P(0,16);
+          const canShoot = adv && !outOfRange(topMan.o), t = canShoot ? 0.55 : 0.35, hp = P(0,16);
           pos.GW = P(hp.x+(topMan.o.x-hp.x)*t, Math.max(17, hp.y+(topMan.o.y-hp.y)*t)); pinned.push("GW");
           jobs.GW = canShoot
             ? J("Deny the swing pass","They can shoot from up top. Step up and get a hand in the passing lane.")
@@ -440,7 +490,7 @@ function solve(ball, trap){
   }
 
   // weak-side forward guarding the rim: split the rim and the nearest weak-side shooter (help-side block), don't hide under the basket
-  if (pos.FW && jobs.FW && jobs.FW.role === "Protect the rim" && !onBall.includes("FW")){
+  if (adv && pos.FW && jobs.FW && jobs.FW.role === "Protect the rim" && !onBall.includes("FW")){
     const ws = state.off.map((o,i)=>({o:m(o),i}))
       .filter(w=>w.i!==state.ball && w.o.x < -8 && w.o.y < 24)
       .sort((a,c)=>Math.hypot(a.o.x+16,a.o.y-10)-Math.hypot(c.o.x+16,c.o.y-10))[0];
@@ -462,12 +512,20 @@ function solve(ball, trap){
     if (pinned.includes(k)) pinSet.add(n);
   }
   // older players shoot from farther out: off-ball defenders shade toward shooters who are in range for this age
-  const pull = {5:0, 10:0.25, 15:0.6}[state.age] || 0;
+  const pull = adv ? ({5:0, 10:0.25, 15:0.6}[state.age] || 0) : 0;
   if (pull){
     for (let n=1;n<=5;n++){
       if (onSet.has(n)) continue;
       const d = out[n].p; let best=null, bd=14;
-      state.off.forEach((o,i)=>{ if (i===state.ball || outOfRange(o)) return; const dd=Math.hypot(o.x-d.x,o.y-d.y); if (dd<bd){bd=dd;best=o;} });
+      state.off.forEach((o,i)=>{
+        if (i===state.ball || outOfRange(o)) return;
+        // only perimeter shooters pull the zone outward; players near the basket are the post defenders' job
+        if (Math.hypot(o.x-BASKET.x, o.y-BASKET.y) < 12) return;
+        // skip a shooter a teammate is already guarding closely enough (e.g. the post player the center is on)
+        const lim = Math.hypot(o.x-BASKET.x, o.y-BASKET.y) < 12 ? 5 : 8;
+        if ([1,2,3,4,5].some(k => out[k].p !== d && Math.hypot(out[k].p.x-o.x, out[k].p.y-o.y) <= lim)) return;
+        const dd=Math.hypot(o.x-d.x,o.y-d.y); if (dd<bd){bd=dd;best=o;}
+      });
       if (best){ const t = toward(best, 4.5); d.x += (t.x-d.x)*pull; d.y += (t.y-d.y)*pull; }
     }
   }
@@ -485,20 +543,29 @@ function solve(ball, trap){
     const nearest = o => Math.min(...all.map(n=>Math.hypot(out[n].p.x-o.x, out[n].p.y-o.y)));
     const used = new Set();
     const shooters = state.off.map((o,i)=>({o,i}))
-      .filter(s => s.i!==state.ball && !outOfRange(s.o))
+      .filter(s => s.i!==state.ball && !outOfRange(s.o) && (adv || Math.hypot(s.o.x-BASKET.x, s.o.y-BASKET.y) < 12))
       .map(s => ({...s, lim: rimD(s.o) < 12 ? 5 : 8}))
-      .sort((a,c) => (nearest(c.o)-c.lim) - (nearest(a.o)-a.lim));
+      // close-in players first, then whoever is closest to the ball (fewest passes away)
+      .sort((a,c) => (a.lim - c.lim) || (Math.hypot(a.o.x-ball.x,a.o.y-ball.y) - Math.hypot(c.o.x-ball.x,c.o.y-ball.y)));
     for (const s of shooters){
       if (nearest(s.o) <= s.lim) continue;
-      const cands = all.filter(n => !onSet.has(n) && !used.has(n))
-        .sort((a,c) => Math.hypot(out[a].p.x-s.o.x,out[a].p.y-s.o.y) - Math.hypot(out[c].p.x-s.o.x,out[c].p.y-s.o.y));
+      // a player near the basket is the center's job first; a forward playing a passing lane is the last choice
+      const cost = n => Math.hypot(out[n].p.x-s.o.x,out[n].p.y-s.o.y)
+        - (s.lim === 5 && n === 5 ? 6 : 0) + (pinSet.has(n) ? 8 : 0);
+      const cands = all.filter(n => !onSet.has(n) && !used.has(n)).sort((a,c) => cost(a) - cost(c));
+      const spot = toward(s.o, s.lim - 1.5);
       for (const n of cands){
         const others = all.filter(k => k!==n && !onSet.has(k));
-        const rimSafe = rimD(out[n].p) > 8 || others.some(k => rimD(out[k].p) <= 8);
+        const rimSafe = rimD(out[n].p) > 8 || rimD(spot) <= 8 || others.some(k => rimD(out[k].p) <= 8);
         if (!rimSafe) continue;
-        const spot = toward(s.o, s.lim - 1.5);
+        // don't pull a defender off another shooter they're the only one guarding
+        const uncovers = shooters.some(s2 => s2 !== s && Math.hypot(out[n].p.x-s2.o.x,out[n].p.y-s2.o.y) <= s2.lim
+          && !others.some(k => Math.hypot(out[k].p.x-s2.o.x,out[k].p.y-s2.o.y) <= s2.lim));
+        if (uncovers) continue;
         out[n].p.x = spot.x; out[n].p.y = spot.y; used.add(n);
-        out[n].job = J("Contest the shooter", `${state.age}-year-olds can score from that spot. Stay close enough to get a hand up.`);
+        out[n].job = s.lim === 5
+          ? J("Guard the post", "Stay between the post player and the basket, hands up.")
+          : J("Contest the shooter", `${state.age}-year-olds can score from that spot. Stay close enough to get a hand up.`);
         break;
       }
     }
@@ -534,11 +601,28 @@ function solve(ball, trap){
       low:  "No trap on the post. The center guards it and the forwards help, so nobody leaves a shooter wide open."
     }[zone];
   }
-  if (trapWanted && state.age === 5) tip = "No trapping at age 5. A trap mostly gives up an easy layup. Keep one defender on the ball.";
+  if (trapWanted && !adv) tip = "Trapping is a Level 2 skill. In Level 1, one defender guards the ball and everyone else stays in their area.";
+  else if (trapWanted && state.age === 5) tip = "No trapping at age 5. A trap mostly gives up an easy layup. Keep one defender on the ball.";
   if (trap && state.age === 15) tip += " Against shooters, every trap leaves someone open. Trap only as a surprise.";
   const sideName = side>0 ? "Right" : "Left";
   const where = {top:"Top of the key", wing:`${sideName} wing`, corner:`${sideName} corner`, short:`${sideName} short corner`,
                  high:"High post", low: X<2 ? "Low post" : `${sideName} low post`}[zone];
+  // beginner: a handful of short, repeatable jobs instead of situation-specific ones
+  if (!adv){
+    for (let n=1;n<=5;n++){
+      const r = out[n].job.role;
+      let simple;
+      if (onSet.has(n)) simple = "Guard the ball";
+      else if (/passing lane|hand to the top/i.test(r)) simple = "Hand in the passing lane";
+      else if (/post/i.test(r) && !/high post/i.test(r)) simple = "Guard the post";
+      else if (/rim/i.test(r)) simple = "Protect the rim";
+      else if (/corner/i.test(r)) simple = "Stay home, ready for the corner";
+      else if (n === 5) simple = "Guard the paint";
+      else if (/elbow|high post|middle|pinch|sink/i.test(r)) simple = "Guard the middle";
+      else simple = "Stay home";
+      out[n].job = J(simple, "");
+    }
+  }
   return {out, onSet, where, tip};
 }
 
@@ -634,6 +718,26 @@ function buildPresets(){
 }
 buildPresets();
 document.getElementById("trap").addEventListener("change",e=>{ state.trap = !!e.target.selected; render(); });
+const levelSw = document.getElementById("level"), trapSw = document.getElementById("trap");
+const levelHint = document.getElementById("level-hint");
+const HINTS = {
+  beginner: "Start home, ball moves you move, hands in the passing lanes, above the line guard / below the line forward, center guards the paint.",
+  advanced: "Forwards play all the way up the passing lanes, plus shading toward shooters by age, closeouts, and trapping."
+};
+const setLevel = adv => {
+  state.level = adv ? "advanced" : "beginner";
+  document.getElementById("lvl-beg").classList.toggle("on", !adv);
+  document.getElementById("lvl-adv").classList.toggle("on", adv);
+  levelHint.textContent = HINTS[state.level];
+  trapSw.disabled = !adv;
+  render();
+};
+levelSw.addEventListener("change", e => setLevel(!!e.target.selected));
+const expBtn = document.getElementById("exp-toggle"), expPanel = document.getElementById("exp-panel");
+expBtn.addEventListener("click", () => {
+  const open = expPanel.hidden; expPanel.hidden = !open; expBtn.setAttribute("aria-expanded", String(open));
+});
+trapSw.disabled = true;
 document.getElementById("show-zones").addEventListener("change",e=>{ gZones.style.display = e.target.selected ? "" : "none"; });
 const ageInput = document.getElementById("age"), ageLabel = document.getElementById("age-label");
 const setAge = ()=>{
