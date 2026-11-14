@@ -89,6 +89,7 @@ body.no-scroll{overflow:hidden}
   .layout{gap:16px}
 }
 .legend{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:12px;font-size:13px;color:var(--md-sys-color-on-surface-variant)}
+.legend i.legend-talk{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#FFD43B;color:#1A1A1A;font:700 11px var(--md-ref-typeface-plain);font-style:normal;vertical-align:-3px}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px}
 .panel{padding:4px 0 0;min-width:0}
 .settings{display:flex;flex-wrap:wrap;gap:20px 48px;align-items:flex-start;padding-block:4px 8px}
@@ -117,7 +118,10 @@ body.no-scroll{overflow:hidden}
 md-list{--md-list-container-color:transparent;padding-block:4px}
 md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-space:4px;--md-list-item-bottom-space:4px;--md-list-item-two-line-container-height:64px;--md-list-item-supporting-text-color:var(--md-sys-color-on-surface-variant)}
 .chip{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;font:700 15px var(--jersey);background:var(--def);color:var(--def-ink)}
-.chip{margin:6px}
+.chip{margin:6px;position:relative}
+.chip-talk{position:absolute;top:-5px;right:-6px;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;
+  background:#FFD43B;color:#1A1A1A;font:700 10px/1 var(--md-ref-typeface-plain);font-style:normal;box-shadow:0 0 0 2px var(--bg)}
+.yell{color:var(--md-sys-color-on-surface-variant);white-space:nowrap}
 .chip.hot{outline:2.5px dashed var(--ball);outline-offset:2px}
 .panel-actions{display:flex;padding:8px 16px 4px}
 .foot{margin:10px 0 0;font-size:13px;color:var(--md-sys-color-on-surface-variant)}
@@ -129,7 +133,20 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
 .rim{fill:none;stroke:var(--ball);stroke-width:2.5}
 .zone polygon,.zone path{stroke-linejoin:round;fill:var(--zc);fill-opacity:.2;stroke:var(--zc);stroke-width:0.7;stroke-opacity:.85}
 #zones{pointer-events:none}
-.def{transition:transform .32s cubic-bezier(.3,.7,.2,1)}
+.def,.talk{transition:transform .6s cubic-bezier(.16,1,.3,1)}  /* ease-out: brisk start, slows into place */
+.talk{display:none;cursor:pointer;outline:none}
+.talk.on{display:inline}
+.talk .hit{fill:transparent}
+.talk .bg{fill:#FFD43B;stroke:var(--court);stroke-width:2}
+.talk text{fill:#1A1A1A;font:700 12px var(--md-ref-typeface-plain);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.talk:focus-visible .bg{stroke:var(--ball);stroke-width:3}
+.talk-pop{position:absolute;z-index:5;width:min(240px,calc(100% - 16px));padding:14px 16px 14px;border-radius:12px;
+  background:var(--md-sys-color-surface-container-high);color:var(--md-sys-color-on-surface);box-shadow:0 4px 16px rgba(0,0,0,.35)}
+.talk-close{position:absolute;top:4px;right:4px;--md-icon-button-icon-color:var(--md-sys-color-on-surface-variant)}
+.talk-who{font:500 12px/16px var(--md-ref-typeface-plain);color:var(--md-sys-color-on-surface-variant);padding-right:32px}
+.talk-call{margin:0 0 2px;padding-right:32px;font:700 28px/1.1 var(--jersey);letter-spacing:.02em;color:var(--md-sys-color-on-surface)}
+.talk-to{font:500 13px/18px var(--md-ref-typeface-plain);color:var(--md-sys-color-primary)}
+.talk-desc{margin:6px 0 0;font-size:14px;line-height:1.45;color:var(--md-sys-color-on-surface-variant)}
 .def circle.body{fill:var(--def)} .def text{fill:var(--def-ink)}
 .def .press{fill:none;stroke:var(--ball);stroke-width:3;stroke-dasharray:5 4;opacity:0}
 .def.onball .press{opacity:1}
@@ -145,7 +162,7 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
 .ballmark .rimline{fill:none;stroke:#2A1608;stroke-width:1.2}
 .tok-text{font-family:var(--jersey);font-weight:700;font-size:15px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
 .svg-label{font:500 12px var(--md-ref-typeface-plain);fill:var(--line);opacity:.65;letter-spacing:.06em}
-@media (prefers-reduced-motion:reduce){.def{transition:none}}
+@media (prefers-reduced-motion:reduce){.def,.talk{transition:none}}
 </style>
 
 <div class="wrap">
@@ -215,7 +232,16 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
         <g id="zones" clip-path="url(#courtclip)" style="display:none"></g>
         <g id="defense"></g>
         <g id="offense"></g>
+        <g id="talk-layer"></g>
       </svg>
+      <div id="talk-pop" class="talk-pop" role="dialog" aria-labelledby="talk-call" hidden>
+        <md-icon-button id="talk-close" class="talk-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </md-icon-button>
+        <div class="talk-call" id="talk-call"></div>
+        <div class="talk-to" id="talk-to"></div>
+        <p class="talk-desc" id="talk-desc"></p>
+      </div>
       <md-filled-tonal-icon-button id="fs-btn" class="fs-btn" aria-label="Full screen">
         <svg class="i-open" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
         <svg class="i-close" hidden viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
@@ -226,6 +252,7 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
         <span><i style="background:var(--off)"></i>Offense (drag, tap to give the ball)</span>
         <span><i style="background:var(--def)"></i>2-3 zone defense</span>
         <span><i style="background:transparent;border:2px dashed var(--ball)"></i>Pressuring the ball</span>
+        <span><i class="legend-talk">!</i>Tap to see what to yell</span>
       </div>
     </section>
 
@@ -621,6 +648,55 @@ function solve(ball, trap){
   const sideName = side>0 ? "Right" : "Left";
   const where = {top:"Top of the key", wing:`${sideName} wing`, corner:`${sideName} corner`, short:`${sideName} short corner`,
                  high:"High post", low: X<2 ? "Low post" : `${sideName} low post`}[zone];
+  // ---- communication: who should be talking, what to yell, and to whom
+  const talk = {};
+  const roleName = n => n<=2 ? "guard" : n<=4 ? "forward" : "center";
+  const who = n => `${n} (${roleName(n)})`;
+  const say = (n, call, to, desc) => { if (n && !talk[n]) talk[n] = {call, to, desc}; };
+  const offB = state.off.map((o,i)=>({o, mo:m(o), i})).filter(x => x.i !== state.ball);
+  const nearestFree = o => [1,2,3,4,5].filter(n=>!onSet.has(n) && !talk[n])
+    .sort((a,c)=>Math.hypot(out[a].p.x-o.x,out[a].p.y-o.y)-Math.hypot(out[c].p.x-o.x,out[c].p.y-o.y))[0];
+  // 1. the ball
+  const ballers = [...onSet];
+  if (ballers.length === 2){
+    say(ballers[0], "Trap!", who(ballers[1]), "Call it so you and your partner jump the ball at the same time. Arms wide, no reaching.");
+    say(ballers[1], "Trap!", who(ballers[0]), "Call it so you and your partner jump the ball at the same time. Arms wide, no reaching.");
+  } else if (ballers.length === 1){
+    say(ballers[0], "Ball!", "Everyone", "You've got the ball. Say it every time so nobody else leaves their spot to chase it.");
+  }
+  // Level 1: just two calls. The ball defender says "Ball!", and the closest teammate behind them says "Help!"
+  if (!adv){
+    if (ballers.length === 1){
+      const bd = out[ballers[0]].p, rimOf = p => Math.hypot(p.x-BASKET.x, p.y-BASKET.y);
+      const backer = [1,2,3,4,5].filter(n => !onSet.has(n) && rimOf(out[n].p) < rimOf(bd))
+        .sort((a,c) => Math.hypot(out[a].p.x-bd.x,out[a].p.y-bd.y) - Math.hypot(out[c].p.x-bd.x,out[c].p.y-bd.y))[0];
+      if (backer) say(backer, "Help!", who(ballers[0]), "You're the closest teammate behind the ball. Tell them you've got their back if they get beat.");
+    }
+  }
+  if (adv){
+  // 2. someone posted up near the basket
+  offB.filter(x => Math.hypot(x.o.x-BASKET.x, x.o.y-BASKET.y) < 9).forEach(x => {
+    say(nearestFree(x.o), "Post!", "Everyone", "Someone is on the block next to you. Call it, then get between them and the ball.");
+  });
+  // 3. someone at the high post (free-throw line)
+  offB.filter(x => Math.abs(x.o.x) < 7 && x.o.y >= 13 && x.o.y <= 22).forEach(x => {
+    say(nearestFree(x.o), "High post!", "Everyone", "Someone is at the free-throw line. Call it so the zone pinches in and nobody catches it there.");
+  });
+  // 4. handoff: below the line it's the forward's ball, so the guard tells them and drops
+  if ((zone === "wing" && Y < 19) || zone === "corner" || zone === "short"){
+    if (onSet.has(id.FB)) say(id.GB, "Yours!", who(id.FB), "Below the line it's the forward's ball. Tell them it's theirs, then drop to the elbow.");
+  }
+  // 5. skip pass: weak-side forward watching a shooter on their side
+  if (X >= 4 && offB.some(x => x.mo.x < -12)){
+    say(id.FW, "Skip!", "Everyone", "Watch the player on your side. If the ball gets thrown over the top, yell it and close out.");
+  }
+  // 6. backing up the ball defender
+  if (zone === "top" || zone === "wing"){
+    const backer = ballers.length===1 && ballers[0] <= 2 ? 5 : null;
+    if (backer) say(backer, "Help!", who(ballers[0]), "Let the defender on the ball know you're behind them if they get beat.");
+  }
+  }
+
   // beginner: a handful of short, repeatable jobs instead of situation-specific ones
   if (!adv){
     for (let n=1;n<=5;n++){
@@ -637,7 +713,7 @@ function solve(ball, trap){
       out[n].job = J(simple, "");
     }
   }
-  return {out, onSet, where, tip};
+  return {out, onSet, where, tip, talk};
 }
 
 /* ---------- drawing ---------- */
@@ -646,6 +722,13 @@ for (let n=1;n<=5;n++){
   const g = document.createElementNS(NS,"g"); g.setAttribute("class","def");
   g.innerHTML = `<circle class="press" r="20"/><circle class="body" r="14"/><text class="tok-text">${n}</text>`;
   gDef.appendChild(g); defEls[n]=g;
+}
+const talkEls = {}, gTalk = document.getElementById("talk-layer");
+for (let n=1;n<=5;n++){
+  const g = document.createElementNS(NS,"g"); g.setAttribute("class","talk"); g.setAttribute("tabindex","0");
+  g.setAttribute("role","button"); g.dataset.n = n;
+  g.innerHTML = `<g class="badge" transform="translate(11 -11)"><circle class="hit" r="14"/><circle class="bg" r="8"/><text>!</text></g>`;
+  gTalk.appendChild(g); talkEls[n] = g;
 }
 const offEls = [];
 for (let i=0;i<5;i++){
@@ -657,6 +740,7 @@ for (let i=0;i<5;i++){
   gOff.appendChild(g); offEls.push(g); wire(g,i);
 }
 
+let lastSolve = null; const lastPos = {};
 function render(){
   state.off.forEach((o,i)=>{
     offEls[i].setAttribute("transform",`translate(${o.x*S} ${o.y*S})`);
@@ -665,14 +749,25 @@ function render(){
   const r = solve(state.off[state.ball], state.trap);
   for (let n=1;n<=5;n++){
     const p = r.out[n].p;
+    // travel time scales with distance: short hops are quick, long slides take longer
+    const prev = lastPos[n], dist = prev ? Math.hypot(p.x-prev.x, p.y-prev.y) : 0;
+    const dur = Math.min(1.1, 0.25 + dist*0.04).toFixed(2) + "s";
+    defEls[n].style.transitionDuration = dur; talkEls[n].style.transitionDuration = dur;
+    lastPos[n] = {x:p.x, y:p.y};
     defEls[n].style.transform = `translate(${p.x*S}px, ${p.y*S}px)`;
     defEls[n].classList.toggle("onball", r.onSet.has(n));
+    talkEls[n].style.transform = `translate(${p.x*S}px, ${p.y*S}px)`;
+    const t = r.talk[n];
+    talkEls[n].classList.toggle("on", !!t);
+    talkEls[n].setAttribute("aria-label", t ? `Defender ${n} should call ${t.call}` : "");
   }
+  lastSolve = r; refreshTalkPop();
   document.getElementById("where").textContent = "Ball at the " + r.where.toLowerCase();
   document.getElementById("tip").textContent = r.tip;
   document.getElementById("jobs").innerHTML = [1,2,3,4,5].map(n=>{
     const j = r.out[n].job;
-    return `<md-list-item><span slot="start" class="chip${r.onSet.has(n)?" hot":""}">${n}</span><div slot="headline">${j.role}</div></md-list-item>`;
+    const t = r.talk[n];
+    return `<md-list-item><span slot="start" class="chip${r.onSet.has(n)?" hot":""}">${n}${t ? '<i class="chip-talk" aria-hidden="true">!</i>' : ""}</span><div slot="headline">${j.role}${t ? ` <span class="yell">· Yell: "${t.call}"</span>` : ""}</div></md-list-item>`;
   }).join("");
 }
 
@@ -779,6 +874,41 @@ fsBtn.addEventListener("click", () => {
 });
 document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && wrapEl.classList.contains("is-full")) setFull(false); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && wrapEl.classList.contains("is-full")) setFull(false); });
+
+// talk badges: tap to see what to yell
+const pop = document.getElementById("talk-pop");
+let popFor = null;
+function placePop(){
+  if (popFor == null || !lastSolve) return;
+  const p = lastSolve.out[popFor].p, wrap = document.querySelector(".court-wrap");
+  const pt = svg.createSVGPoint(); pt.x = p.x*S + 11; pt.y = p.y*S - 11;
+  const sc = pt.matrixTransform(svg.getScreenCTM()), wr = wrap.getBoundingClientRect();
+  let left = sc.x - wr.left + 12, top = sc.y - wr.top + 12;
+  const w = pop.offsetWidth, h = pop.offsetHeight;
+  if (left + w > wr.width - 8) left = sc.x - wr.left - w - 12;
+  if (top + h > wr.height - 8) top = sc.y - wr.top - h - 12;
+  pop.style.left = Math.max(8, left) + "px"; pop.style.top = Math.max(8, top) + "px";
+}
+function openPop(n){
+  const t = lastSolve && lastSolve.talk[n]; if (!t) return closePop();
+  popFor = n;
+  document.getElementById("talk-call").textContent = `Yell: "${t.call}"`;
+  document.getElementById("talk-to").textContent = `To: ${t.to}`;
+  document.getElementById("talk-desc").textContent = t.desc;
+  pop.hidden = false; placePop();
+}
+function closePop(){ popFor = null; pop.hidden = true; }
+function refreshTalkPop(){ if (popFor != null) openPop(popFor); }
+Object.values(talkEls).forEach(g => {
+  g.addEventListener("pointerdown", e => e.stopPropagation());
+  g.addEventListener("click", e => { e.stopPropagation(); const n = +g.dataset.n; popFor === n ? closePop() : openPop(n); });
+  g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); openPop(+g.dataset.n); } });
+});
+document.getElementById("talk-close").addEventListener("click", closePop);
+pop.addEventListener("pointerdown", e => e.stopPropagation());
+document.addEventListener("pointerdown", () => { if (popFor != null) closePop(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePop(); });
+window.addEventListener("resize", placePop);
 
 // light/dark mode switch in the header
 const themeSw = document.getElementById("theme"), rootEl = document.documentElement;
