@@ -424,7 +424,7 @@ function solve(ball, trap){
     }
   } else if (zone === "corner"){
     if (!trap){
-      pos.FB = toward(b, ballD(3)); pos.C = P(5,5); pos.GB = P(11,15); pos.GW = P(0,15); pos.FW = P(-3,6);
+      pos.FB = toward(b, ballD(3)); pos.C = P(5,5); pos.GB = P(11,15); pos.GW = P(0,17); pos.FW = P(-3,6);
       onBall = ["FB"];
       jobs.FB = J("On the ball","Close out short. Don't give up the baseline drive.");
       jobs.C  = J("Front the low post","Stay between the ball and the block.");
@@ -452,8 +452,10 @@ function solve(ball, trap){
     jobs.FW = J("Protect the rim","You're the only one at the basket. Box out on shots.");
     tip = "Trap the short corner. The center and forward trap, and the guards cover the passes out.";
   } else if (zone === "short"){
-    pos.FB = toward(b,2.5); pos.C = P(Math.max(2.5, X-5.5), Math.max(5, Y)); pos.GB = P(9,15);
-    pos.GW = P(0,14); pos.FW = P(-3.5,5);
+    // center stays on the ball-side block (inside the lane line), not out in the short corner next to the forward;
+    // the weak-side guard holds the free-throw line instead of sinking into the paint
+    pos.FB = toward(b,2.5); pos.C = P(4.5,5.5); pos.GB = P(9,15);
+    pos.GW = P(0,17); pos.FW = P(-3.5,5);
     onBall = ["FB"];
     jobs.FB = J("On the ball","Stay between the ball and the basket. Don't give up the baseline.");
     jobs.C  = J("Cover the block","Stay on the rim side and front anyone on the block.");
