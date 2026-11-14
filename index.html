@@ -127,7 +127,7 @@ md-list-item{--md-list-item-one-line-container-height:44px;--md-list-item-top-sp
 .ln-faint{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:6 6;opacity:.5}
 .block{fill:var(--line)}
 .rim{fill:none;stroke:var(--ball);stroke-width:2.5}
-.zone polygon{stroke-linejoin:round;fill:var(--zc);fill-opacity:.2;stroke:var(--zc);stroke-width:0.7;stroke-opacity:.85}
+.zone polygon,.zone path{stroke-linejoin:round;fill:var(--zc);fill-opacity:.2;stroke:var(--zc);stroke-width:0.7;stroke-opacity:.85}
 #zones{pointer-events:none}
 .def{transition:transform .32s cubic-bezier(.3,.7,.2,1)}
 .def circle.body{fill:var(--def)} .def text{fill:var(--def-ink)}
@@ -256,18 +256,30 @@ const svg = document.getElementById("court");
 const gDef = document.getElementById("defense"), gOff = document.getElementById("offense");
 // each defender's home area, in feet; neighbors overlap on purpose (gaps get covered by two people)
 // polygons in feet (x across, y out from the baseline)
-const G1 = [[2,15],[2,32],[-17,32],[-22,21],[-22,16],[-7,15]];
-const F3 = [[-25,0],[-4,0],[-4,10],[-7,15],[-14,21.5],[-25,21.5]];
+// the guard/forward handoff on the wing is a narrow band centered on the free-throw line extended (19 ft):
+// guards reach down to 18 ft, forwards up to 20 ft, matching "above the line, guard; below the line, forward"
+const G1 = [[2,18],[2,29],[-11,27.5],[-20,22.5],[-23,18]];  // guards = the top: elbow line out to a few feet past the arc, following its curve
+const F3 = [[-25,0],[-4,0],[-4,12],[-10,20],[-25,20]];  // forwards = sideline to the block, baseline to just above the line; corner cut at the elbow
+// guard area: flat bottom just below the free-throw line, outer edge a smooth curve a few feet outside the 3-point arc
+function guardPath(side){            // side -1 = left guard, +1 = right guard (screen)
+  const R = 23.5, cy = 5.25, yb = 18, xIn = 2*-side;            // overlap strip 2 ft past the middle
+  const xOut = side*Math.sqrt(R*R-(yb-cy)**2), yTop = cy+Math.sqrt(R*R-xIn*xIn);
+  const sweep = side < 0 ? 1 : 0;
+  return `M ${xIn*S},${yb*S} L ${xIn*S},${(yTop*S).toFixed(1)} A ${R*S} ${R*S} 0 0 ${sweep} ${(xOut*S).toFixed(1)},${yb*S} Z`;
+}
 const mirror = pts => pts.map(([x,y])=>[-x,y]);
 const ZONES = [
-  {n:1, pts:G1},
-  {n:2, pts:mirror(G1)},
+  {n:1, d:guardPath(-1)},
+  {n:2, d:guardPath(1)},
   {n:3, pts:F3},
   {n:4, pts:mirror(F3)},
-  {n:5, pts:[[-7,0],[7,0],[7,14],[3,20],[-3,20],[-7,14]]}
+  {n:5, pts:[[-6,0],[6,0],[6,20],[-6,20]]}      // center = the lane, up to the free-throw line
 ];
 const gZones = document.getElementById("zones");
-gZones.innerHTML = ZONES.map(z=>`<g class="zone" style="--zc:var(--z${z.n})"><polygon points="${z.pts.map(([x,y])=>`${x*S},${y*S}`).join(" ")}"/></g>`).join("");
+// both levels use the same fixed, overlapping home areas
+function drawZones(){
+  gZones.innerHTML = ZONES.map(z=>`<g class="zone" style="--zc:var(--z${z.n})">${z.d ? `<path d="${z.d}"/>` : `<polygon points="${z.pts.map(([x,y])=>`${x*S},${y*S}`).join(" ")}"/>`}</g>`).join("");
+}
 const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
 const P = (x,y)=>({x,y});
 // rough reliable shooting range (feet from the rim) by age
@@ -730,6 +742,7 @@ const setLevel = adv => {
   document.getElementById("lvl-adv").classList.toggle("on", adv);
   levelHint.textContent = HINTS[state.level];
   trapSw.disabled = !adv;
+  drawZones();
   render();
 };
 levelSw.addEventListener("change", e => setLevel(!!e.target.selected));
@@ -778,7 +791,7 @@ themeSw.addEventListener("change", e => {
 
 // first paint without the slide-in animation
 Object.values(defEls).forEach(g=>g.style.transition="none");
-loadPreset("4out"); render();
+loadPreset("4out"); drawZones(); render();
 requestAnimationFrame(()=>requestAnimationFrame(()=>Object.values(defEls).forEach(g=>g.style.transition="")));
 })();
 </script>
