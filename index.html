@@ -380,7 +380,7 @@ function drawZones(){
 const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
 const P = (x,y)=>({x,y});
 // rough reliable shooting range (feet from the rim) by age
-const AGES = [5,10,15], RANGE = {5:9, 10:15, 15:21};
+const AGES = [5,10,15], RANGE = {5:9, 10:15, 15:24};   // 15: anywhere around the 3-point line, a step behind it included
 const outOfRange = p => Math.hypot(p.x - BASKET.x, p.y - BASKET.y) > RANGE[state.age];
 
 function loadPreset(key){
@@ -623,7 +623,7 @@ function solve(ball, trap){
     if (pinned.includes(k)) pinSet.add(n);
   }
   // older players shoot from farther out: off-ball defenders shade toward shooters who are in range for this age
-  const pull = adv ? ({5:0, 10:0.25, 15:0.6}[state.age] || 0) : 0;
+  const pull = (adv ? {5:0, 10:0.25, 15:0.6} : {5:0, 10:0.15, 15:0.45})[state.age] || 0;
   if (pull){
     for (let n=1;n<=5;n++){
       if (onSet.has(n)) continue;
@@ -722,7 +722,7 @@ function solve(ball, trap){
   const talk = {};
   const roleName = n => n<=2 ? "guard" : n<=4 ? "forward" : "center";
   const who = n => `${n} (${roleName(n)})`;
-  const say = (n, call, to, desc) => { if (n && !talk[n]) talk[n] = {call, to, desc}; };
+  const say = (n, call, to, desc) => { if (n && !talk[n]) { const m2 = /^(\d) \(/.exec(to); talk[n] = {call, to, toN: m2 ? +m2[1] : null, desc}; } };
   const offB = state.off.map((o,i)=>({o, mo:m(o), i})).filter(x => x.i !== state.ball);
   const nearestFree = o => [1,2,3,4,5].filter(n=>!onSet.has(n) && !talk[n])
     .sort((a,c)=>Math.hypot(out[a].p.x-o.x,out[a].p.y-o.y)-Math.hypot(out[c].p.x-o.x,out[c].p.y-o.y))[0];
@@ -1171,7 +1171,8 @@ function openPop(n){
   const t = lastSolve && lastSolve.talk[n]; if (!t) return closePop();
   popFor = n;
   document.getElementById("talk-call").textContent = `Yell: "${t.call}"`;
-  document.getElementById("talk-to").textContent = `To: ${t.to}`;
+  const toPl = t.toN ? playerFor(t.toN) : null;   // use the roster name when one is entered
+  document.getElementById("talk-to").textContent = toPl && toPl.name ? `To: ${toPl.name} (${t.toN} position)` : `To: ${t.to}`;
   document.getElementById("talk-desc").textContent = t.desc;
   pop.hidden = false; placePop();
 }
