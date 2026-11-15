@@ -579,7 +579,18 @@ function solve(ball, trap){
       tip = "Double the ball in the middle. Guards dig down, the center stays under it.";
     }
   } else { // low post
-    if (!trap){
+    if (!trap && X >= 6){
+      // ball on the block but outside the lane line: that's the forward's area, so the forward guards it
+      // and the center helps from the rim side
+      pos.FB = toward(b,1.3); pos.C = P(X*0.25, Math.max(4.5, Y*0.5 + BASKET.y*0.5)); pos.FW = P(-4.5,5.5);
+      pos.GB = P(7,15); pos.GW = P(-4,16);
+      onBall = ["FB"];
+      jobs.FB = J("Guard the post","It's outside the lane, so it's yours. Stay between the ball and the basket, hands up.");
+      jobs.C  = J("Help on the post","Stay on the rim side, ready to stop a drive or a spin to the basket.");
+      jobs.FW = J("Protect the rim","Box out on the shot.");
+      jobs.GB = jobs.GW = J("Sink to the elbow","Drop down to help and watch for kick-outs.");
+      tip = "Ball on the block outside the lane: the forward guards it and the center helps from the rim side.";
+    } else if (!trap){
       pos.C = toward(b,2); pos.FB = P(Math.min(X+5,13), Math.max(Y,5)); pos.FW = P(-4,5.5);
       pos.GB = P(6,15); pos.GW = P(-5,15);
       onBall = ["C"];
@@ -774,6 +785,7 @@ function solve(ball, trap){
       let simple;
       if (onSet.has(n)) simple = "Guard the ball";
       else if (/passing lane|hand to the top/i.test(r)) simple = "Hand in the passing lane";
+      else if (/help on the post/i.test(r)) simple = "Help on the post";
       else if (/post/i.test(r) && !/high post/i.test(r)) simple = "Guard the post";
       else if (/rim/i.test(r)) simple = "Protect the rim";
       else if (/corner/i.test(r)) simple = "Stay home, ready for the corner";
